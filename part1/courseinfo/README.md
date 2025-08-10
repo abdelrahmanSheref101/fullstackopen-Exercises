@@ -5,3 +5,4 @@
   - [x] 1.2 : further organization to 1.1 to reduce redundent code
   - [x] 1.3 : encapsulating the part information in objects
   * [x] 1.4 : get all parts into one array
+  * [x] 1.5 : encapsulating all course related info in one object (course name + course parts)
