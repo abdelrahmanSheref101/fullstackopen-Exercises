@@ -1,13 +1,18 @@
 import { useState } from 'react'
 
+
 const Qoute=(props)=>{
-        console.log("rendering qoute : ",props.text);
+        if(!props.text)
+                return(
+                        <div>
+                        </div>
+                );
         return(
                 <div>
-                    {props.text}    
+                       <p >{props.text}</p> 
+                        <p >has {(props.votes)?props.votes:0} votes</p>
                 </div>
         )
-
 }
 
 const Button=(props)=>{
@@ -28,18 +33,45 @@ const App = () => {
     'The only way to go fast, is to go well.'
   ]
    
+
+
+
         const [selected, setSelected] = useState(0)
+        const [votes,setVotes]=useState([]);
+        const [mostVoted,setMost]=useState(-1);
 
         const getRandomQoute=()=>{
-                console.log(selected);
                 setSelected(Math.floor(Math.random()*anecdotes.length));         
         }
 
+        const voteForQoute=()=>{
+                let copy=[...votes];
+                if(!copy[selected])
+                        copy[selected]=0;
+
+                ++copy[selected];
+
+                
+                if(mostVoted == -1)
+                        setMost(selected);
+                else if(copy[selected] > copy[mostVoted])
+                        setMost(selected);
+                              
+
+                setVotes(copy);
+        }
+
+
   return (
-        <>
-                <Qoute text={anecdotes[selected]}/>
-                <Button onClick={getRandomQoute} text="get random qoute"/>
-        </>
+                <>
+                        <h1>Anecdote of the day</h1>
+                        <Qoute text={anecdotes[selected]} votes={votes[selected]}/>
+                        <Button onClick={getRandomQoute} text="next anecdotes"/>
+                        <Button onClick={voteForQoute} text="vote"/>
+
+                        <h1>Anecdote with most votes</h1>
+                        <Qoute text={anecdotes[mostVoted]} votes={votes[mostVoted]}/>
+                </>
   )
 }
 
