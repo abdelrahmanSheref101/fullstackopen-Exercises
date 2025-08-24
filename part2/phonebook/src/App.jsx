@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import comp2Objs from "./compareObjects.js"
 import './App.css';
-import axios from 'axios';
-
+import Form from "./components/Form.jsx"
+import DisplayPersons from "./components/DisplayPersons.jsx"
+import SearchFilter from "./components/SearchFilter.jsx"
+import personsService from "./services/persons.js"
 
 function App() {
         const [persons, setPersons] = useState([]);
@@ -11,9 +13,8 @@ function App() {
 
 
         useEffect(()=>{
-                axios.get("http://localhost:3001/persons").then(response=>{
-                        setPersons(response.data);
-                });
+                personsService.getAll().then(initPersons=>setPersons(initPersons));                
+
         },[]);
 
         const handleChange=(event)=>{
@@ -29,7 +30,9 @@ function App() {
                         alert(`${personObj.name} is already added to phonebook`);
                         return;
                 }
-                setPersons(persons.concat(personObj));
+                personsService.create(personObj).then(
+                        createdPerson=>setPersons(persons.concat(createdPerson))
+                );
         }
 
         function checkPersonExist(newPerson , persons){
@@ -61,53 +64,8 @@ function App() {
 
 export default App
 
-const SearchFilter=({query,setQuery})=>{
-                        return(
-                        <div>
-                                Search: <input value={query} onChange={(event)=>setQuery(event.target.value)} />
-                        </div>
-                        );
-}
-
-const Form=({newPerson,handleChange,addPerson})=>
-{
-        return(
-                        <form onSubmit={addPerson}>
-
-                                <label >
-                                        Name: <input value={newPerson.name} onChange={handleChange} type="text" name="name"/>
-                                </label>
-                                <br/>
-                                <label >
-                                        Number:  <input value={newPerson.number} onChange={handleChange} type="text" name="number"/>
-                                </label>
-                                <br/>
-                                <button type='submit' >add</button>
-
-                        </form>
-
-        )
-}
-
-const DisplayPersons=({persons})=>{
-        return(
-                <div>
-                        {persons.map(person=><Person key={person.id} person={person}/>)}
-                </div>
-        );
-}
 
 
-const Person=({person})=>{
-        return(
-                <table className='table'>
-                        <tbody>
-                                <tr><th>Name:</th><td>{person.name}</td></tr>
-                                <tr><th>Number:</th><td>{person.number}</td></tr>
-                        </tbody>
-                </table>
-        )
-}
 
 
 
