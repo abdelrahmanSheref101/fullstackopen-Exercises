@@ -45,6 +45,14 @@ function App() {
 
         const shownPersons=persons.filter(person=>person.name.toLowerCase().includes(query.toLowerCase()));
 
+        function deletePerson(id){
+                const prsn=persons.find(p=>p.id==id);
+                if(window.confirm(`Delete ${prsn.name}`))
+                        personsService.delEntry(id).then((res)=>{
+                                console.log('successful deletion : ',res);
+                                // setPersons(persons.map(p=>p.id!=id));
+                        });
+        }
 
         return(
                 <div>
@@ -57,7 +65,7 @@ function App() {
 
                         <h2>Numbers</h2>
 
-                        <DisplayPersons persons={shownPersons}/>
+                        <DisplayPersons deletePerson={deletePerson}  persons={shownPersons}/>
                 </div>
         );
 }
