@@ -4,13 +4,12 @@ const baseUrl = "/api/persons";
 const getAll = () => {
         let request = axios.get(baseUrl);
         return request.then((res) => {
-                console.log(" resposne ::: ", res);
                 return res.data;
         });
 };
 
 const update = (id, newPerson) => {
-        let request = axios.put(`${baseUrl}/${id}`, newPerson);
+        let request = axios.patch(`${baseUrl}/${id}`, newPerson);
         return request.then((res) => res.data);
 };
 
