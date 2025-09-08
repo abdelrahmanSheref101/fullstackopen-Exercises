@@ -90,7 +90,7 @@ function App() {
                 const prsn = persons.find((p) => p.id == id);
                 if (window.confirm(`Delete ${prsn.name}`))
                         personsService.delEntry(id).then((res) => {
-                                handleNotifSetting(`Deleted ${res.name} from the Phonebook`, false);
+                                handleNotifSetting(`Deleted ${prsn.name} from the Phonebook`, false);
                                 setPersons(persons.filter((p) => p.id != id));
                         });
         }

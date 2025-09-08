@@ -9,7 +9,7 @@ const getAll = () => {
 };
 
 const update = (id, newPerson) => {
-        let request = axios.patch(`${baseUrl}/${id}`, newPerson);
+        let request = axios.put(`${baseUrl}/${id}`, newPerson);
         return request.then((res) => res.data);
 };
 
