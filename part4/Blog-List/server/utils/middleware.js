@@ -14,7 +14,9 @@ const unknowEndpoint = (req, res, next) => {
 }
 
 const errorHandler = (err, req, res, next) => {
-        error("we got an error :: ", err);
+        if (err.name === "ValidationError")
+                res.status(400).json(err.message);
+        // error("we got an error :: ", err);
         next(err);
 }
 
