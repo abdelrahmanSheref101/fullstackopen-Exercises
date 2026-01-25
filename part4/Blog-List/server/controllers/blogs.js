@@ -1,14 +1,19 @@
 const { default: mongoose } = require('mongoose');
 const Blog = require('../models/blogs');
 const { info } = require('../utils/logger');
-const { update } = require('lodash');
+const User = require('../models/users');
 const blogsRouter = require('express').Router();
+const { InvalidUser } = require('../errors/invalidUser');
 
-//get all blogs
-//post a blog
+const { UnAutherizedUserError } = require('../errors/unautherizedUserError');
+const { userExtractor } = require('../utils/middleware');
+
+
+
 
 blogsRouter.get("/", async (req, res) => {
-        const blogs = await Blog.find({});
+        const blogs = await Blog.find({}).populate("author", "username");
+
         res.json(blogs);
 });
 
@@ -18,31 +23,53 @@ blogsRouter.get("/:id", async (req, res) => {
         res.json(blog);
 });
 
-blogsRouter.post("/", async (req, response) => {
+
+blogsRouter.post("/", userExtractor, async (req, response) => {
+
 
         const blog = new Blog(req.body);
-        if (!blog.likes) {
-                blog.likes = 0;
-        }
+
+
+        blog.author = req.user._id;
+
+        info("the user :: ", req.user);
         const savedBlog = await blog.save();
+        info(req.user.blogs);
+        req.user.blogs = req.user.blogs.concat(savedBlog._id);
+        await req.user.save();
+
+
         response.status(201).json(savedBlog);
 })
 
-blogsRouter.delete("/:id", async (req, res) => {
+blogsRouter.delete("/:id", userExtractor, async (req, res) => {
 
 
         const blogId = req.params.id;
 
 
-        if (!mongoose.Types.ObjectId.isValid(blogId))
-                return res.status(404).json({
-                        error: "INVALID ID"
-                })
+
 
         if (!blogId)
                 return res.status(404).json({
                         error: "EMPTY ID"
                 })
+
+        const blog = await Blog.findById(blogId);
+
+        const logedInUserID = req.user._id.toString();
+
+        info("logedin user id :: ", logedInUserID);
+        info("logedin user id :: ", logedInUserID, " ", blog.author.toString());
+
+        if (logedInUserID !== blog.author.toString())
+                throw new UnAutherizedUserError();
+
+
+        req.user.blogs = req.user.blogs.filter(b => b.toString() !== blog.id);
+
+
+        await req.user.save();
 
         const result = await Blog.findByIdAndDelete(blogId);
 

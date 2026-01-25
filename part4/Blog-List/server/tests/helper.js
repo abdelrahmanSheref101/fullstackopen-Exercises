@@ -44,4 +44,6 @@ const initial_blogs = [
         }
 ];
 
-module.exports = { initial_blogs }
+const
+
+        module.exports = { initial_blogs }

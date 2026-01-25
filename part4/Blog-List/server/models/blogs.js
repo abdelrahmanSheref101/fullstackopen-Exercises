@@ -8,17 +8,25 @@ const blogSchema = mongoose.Schema({
                 type: String,
                 required: [true, "title is required !"]
         },
-        author: String,
+        author: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+                required: [true, "user is required"]
+        },
         url: {
                 type: String,
                 required: [true, "URL is required !"]
         },
-        likes: Number,
+        likes: {
+                type: Number,
+                default: 0,
+        },
 });
 
 blogSchema.set('toJSON', {
         transform: (document, returnedObject) => {
-                returnedObject.id = document._id.toString();
+                if (document._id)
+                        returnedObject.id = document._id.toString();
                 delete returnedObject._id
                 delete returnedObject.__v
         }

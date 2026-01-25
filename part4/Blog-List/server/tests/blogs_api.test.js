@@ -11,21 +11,17 @@ const helper = require("./helper.js");
 const { info } = require("../utils/logger.js");
 const { initial } = require("lodash");
 const { response } = require("express");
+const User = require("../models/users.js");
 
 const api = supertest(app);
 
 beforeEach(async () => {
 
         await Blog.deleteMany({});
+        await User.deleteMany({});
         await Blog.insertMany(helper.initial_blogs);
 });
 
-const newBlog = {
-        title: "new blog 101",
-        author: "me",
-        url: "nan",
-        likes: "69"
-}
 const noLikesBlog = {
         title: "im a blog with no like , i should have zero in me",
         author: "some guy",
@@ -42,54 +38,90 @@ const noUrlBlog = {
         likes: "132"
 }
 
+
+
+
+const createUserAndToken = async () => {
+        const testUser = {
+                username: "test-user-1",
+                password: "test-user-1-password"
+        };
+        await api.post("/api/users").send(testUser)
+        const res = await api.post("/api/login").send(testUser);
+        return res.body.token;
+}
+
 describe("integration testing : blogs api", () => {
-        test("getting all blogs", async () => {
-                const response = await api.get("/api/blogs")
-                        .expect(200);
 
-                const blogs = response.body;
-                assert.strictEqual(blogs.length, helper.initial_blogs.length)
+
+
+        describe("blogs querying", () => {
+                test("getting all blogs", async () => {
+                        const response = await api.get("/api/blogs")
+                                .expect(200);
+
+                        const blogs = response.body;
+                        assert.strictEqual(blogs.length, helper.initial_blogs.length)
+                })
+
+        });
+
+        describe("blogs creation (with valid token and user)", () => {
+
+
+                test.only("creating a blog successfull", async () => {
+                        const token = await createUserAndToken();
+
+                        const newBlog = {
+                                title: "new blog 101",
+                                author: "me",
+                                url: "nan",
+                                likes: "69"
+                        }
+
+                        await api.post("/api/blogs").set('Authorization', `Bearer ${token}`).send(newBlog).expect(201);
+
+                        const response = await api.get("/api/blogs");
+                        const contents = response.body;
+                        assert.strictEqual(response.body.length, helper.initial_blogs.length + 1)
+                        assert.strictEqual(contents.some((blog) =>
+                                blog.title == newBlog.title && blog.author == newBlog.author && newBlog.url == blog.url && newBlog.likes == blog.likes
+                        ), true)
+                })
+
+                test("creating a blog with no likes (expected to be with zero likes)", async () => {
+                        const resposne = await api.post("/api/blogs").send(noLikesBlog).expect(201);
+                        assert.strictEqual(response.body, false);
+                        assert.strictEqual(resposne.body["likes"], 0);
+                })
+
+                test("creating an invalid blog (no title)", async () => {
+
+                        const resposne = await api.post("/api/blogs").send(noTitleBlog).expect(400);
+                        assert.strictEqual(resposne.body, "Blog validation failed: title: title is required !");
+                })
+
+                test("creating an invalid blog (no url)", async () => {
+
+                        const resposne = await api.post("/api/blogs").send(noUrlBlog).expect(400);
+                        assert.strictEqual(resposne.body, "Blog validation failed: url: URL is required !");
+                })
+
+        });
+        describe("structure validation :: ", () => {
+                test("unique id is named id not _id", async () => {
+
+                        const response = await api.get("/api/blogs")
+                                .expect(200);
+                        const blogs = response.body;
+                        blogs.forEach(blog => {
+                                assert.strictEqual(Object.keys(blog).includes("id"), true);
+                                assert.strictEqual(Object.keys(blog).includes("_id"), false);
+
+                        });
+                })
         })
 
-        test("unique id is named id not _id", async () => {
-
-                const response = await api.get("/api/blogs")
-                        .expect(200);
-                const blogs = response.body;
-                blogs.forEach(blog => {
-                        assert.strictEqual(Object.keys(blog).includes("id"), true);
-                        assert.strictEqual(Object.keys(blog).includes("_id"), false);
-
-                });
-        })
-
-        test("successfull post a blog", async () => {
-                await api.post("/api/blogs").send(newBlog).expect(201);
-                const response = await api.get("/api/blogs");
-                const contents = response.body;
-                assert.strictEqual(response.body.length, helper.initial_blogs.length + 1)
-                assert.strictEqual(contents.some((blog) =>
-                        blog.title == newBlog.title && blog.author == newBlog.author && newBlog.url == blog.url && newBlog.likes == blog.likes
-                ), true)
-        })
-
-        test("creating a note with no likes (expected to be with zero likes)", async () => {
-                const resposne = await api.post("/api/blogs").send(noLikesBlog).expect(201);
-                assert.strictEqual(response.body, false);
-                assert.strictEqual(resposne.body["likes"], 0);
-        })
-
-        test("creating an invalid blog (no title)", async () => {
-
-                const resposne = await api.post("/api/blogs").send(noTitleBlog).expect(400);
-                assert.strictEqual(resposne.body, "Blog validation failed: title: title is required !");
-        })
-
-        test("creating an invalid blog (no url)", async () => {
-
-                const resposne = await api.post("/api/blogs").send(noUrlBlog).expect(400);
-                assert.strictEqual(resposne.body, "Blog validation failed: url: URL is required !");
-        })
 
         describe('testing deletion',
                 () => {
@@ -111,7 +143,7 @@ describe("integration testing : blogs api", () => {
                         // })
                 })
 
-        describe.only('testing updating a blog', () => {
+        describe('testing updating a blog', () => {
                 test('updating a blog with valid id', async () => {
                         const updatedBlog = {
                                 author: "elsayd elbadawy",
