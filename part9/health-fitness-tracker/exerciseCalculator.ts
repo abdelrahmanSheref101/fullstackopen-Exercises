@@ -1,25 +1,26 @@
-interface ExercisesValues {
-        dailyHours: number[],
-        targetAvg: number
-}
+// interface ExercisesValues {
+//         dailyHours: number[],
+//         targetAvg: number
+// }
 
-function parseExerArguments(args: string[]): ExercisesValues {
-        if (args.length < 4) throw new Error("Not enough arguments");
+// function parseExerArguments(args: string[]): ExercisesValues {
+//         if (args.length < 4) throw new Error("Not enough arguments");
+//
+//         const values = args.slice(2).map(Number);
+//         if (values.some(isNaN))
+//                 throw new Error("values must be numbers !!")
+//
+//
+//         return {
+//                 dailyHours: values.slice(1, values.length),
+//                 targetAvg: values[0]
+//         };
+//
+//
+// }
+//
 
-        const values = args.slice(2).map(Number);
-        if (values.some(isNaN))
-                throw new Error("values must be numbers !!")
-
-
-        return {
-                dailyHours: values.slice(1, values.length),
-                targetAvg: values[0]
-        };
-
-
-}
-
-interface ExercisesReport {
+export interface ExercisesReport {
         periodLength: number,
         trainingDays: number,
         target: number,
@@ -29,7 +30,7 @@ interface ExercisesReport {
         ratingDescription: string,
 }
 
-function calculateExercises(dailyHours: number[], targetAvg: number): ExercisesReport {
+export function calculateExercises(dailyHours: number[], targetAvg: number): ExercisesReport {
 
         const trainingDaysValues = dailyHours.filter(day => day !== 0);
         const trainingDays = trainingDaysValues.length;
@@ -76,14 +77,14 @@ function calculateExercises(dailyHours: number[], targetAvg: number): ExercisesR
 }
 
 
-
-try {
-        const { dailyHours, targetAvg }: ExercisesValues = parseExerArguments(process.argv);
-        const report: ExercisesReport = calculateExercises(dailyHours, targetAvg);
-        console.log(report);
-} catch (error) {
-        let errMsg = "smth bad happend ::";
-        if (error instanceof Error)
-                errMsg += " ERROR : " + error.message;
-        console.log(errMsg);
-}
+//
+// try {
+//         const { dailyHours, targetAvg }: ExercisesValues = parseExerArguments(process.argv);
+//         const report: ExercisesReport = calculateExercises(dailyHours, targetAvg);
+//         console.log(report);
+// } catch (error) {
+//         let errMsg = "smth bad happend ::";
+//         if (error instanceof Error)
+//                 errMsg += " ERROR : " + error.message;
+//         console.log(errMsg);
+// }

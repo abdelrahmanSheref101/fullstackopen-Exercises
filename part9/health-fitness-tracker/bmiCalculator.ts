@@ -1,24 +1,24 @@
-interface BmiVlaues {
-        height: number,
-        weight: number,
-}
+// interface BmiVlaues {
+//         height: number,
+//         weight: number,
+// }
 
 
 
-const parseArguments = (args: string[]): BmiVlaues => {
-        if (args.length < 4) throw new Error("not enough arguments");
-        if (args.length > 4) throw new Error("too many arguments");
-
-        if (!isNaN(Number(args[2])) && !isNaN(Number(args[3])))
-                return {
-                        height: Number(args[2]),
-                        weight: Number(args[3])
-                }
-        else
-                throw new Error("arguments must be number !");
-}
-
-const bmiCalculator = (height: number, weight: number): string => {
+// const parseArguments = (args: string[]): BmiVlaues => {
+//         if (args.length < 4) throw new Error("not enough arguments");
+//         if (args.length > 4) throw new Error("too many arguments");
+//
+//         if (!isNaN(Number(args[2])) && !isNaN(Number(args[3])))
+//                 return {
+//                         height: Number(args[2]),
+//                         weight: Number(args[3])
+//                 }
+//         else
+//                 throw new Error("arguments must be number !");
+// }
+//
+export const calculateBmi = (height: number, weight: number): string => {
 
         const heightInMeters: number = height / 100.0;
 
@@ -47,16 +47,16 @@ const bmiCalculator = (height: number, weight: number): string => {
 
 
 
-try {
-        const { height, weight } = parseArguments(process.argv);
-
-        console.log("hey fatty , ur BMI :: ", bmiCalculator(height, weight));
-
-
-} catch (error) {
-        let errorMessage: string = "smth bad happend.";
-        if (error instanceof Error)
-                errorMessage += " ERROR: " + error.message;
-
-        console.log(errorMessage);
-}
+// try {
+//         const { height, weight } = parseArguments(process.argv);
+//
+//         console.log("hey fatty , ur BMI :: ", bmiCalculator(height, weight));
+//
+//
+// } catch (error) {
+//         let errorMessage: string = "smth bad happend.";
+//         if (error instanceof Error)
+//                 errorMessage += " ERROR: " + error.message;
+//
+//         console.log(errorMessage);
+// }
